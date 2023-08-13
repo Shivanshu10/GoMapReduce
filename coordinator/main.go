@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main() {
-	fmt.Printf("hello world")
+	fmt.Printf("[*] Starting Coordinator Server")
 }
