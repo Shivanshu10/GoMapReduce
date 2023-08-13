@@ -1,9 +1,11 @@
 package main
 
 import (
-	"fmt"
+	"GoMapReduce/coordinator/coordinatorlib"
+	"log"
 )
 
 func main() {
-	fmt.Printf("[*] Starting Coordinator Server")
+	log.Println("[*] Starting Coordinator Server")
+	_ = coordinatorlib.MakeCoordinator()
 }

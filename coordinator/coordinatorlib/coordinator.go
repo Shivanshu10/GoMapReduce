@@ -1,31 +1,24 @@
 package coordinatorlib
 
 import (
-	"GoMapReduce/common/rpcdef"
+	"GoMapReduce/common/rpc"
 	"fmt"
 	"log"
-	"net"
-	"net/http"
-	"net/rpc"
-	"os"
 )
 
 type Coordinator struct {
 	tasks []Task
 }
 
-func (c *Coordinator) Example(args *rpcdef.ExampleArgs, reply *rpcdef.ExampleReply) error {
-	reply.Y = args.X + 1
-	return nil
-}
-
 func (c *Coordinator) PrintInfo() {
+	log.Println("PrintInfo Called")
 	for _, t := range c.tasks {
 		log.Println(fmt.Sprintf("%#v", t))
 	}
 }
 
-func (c *Coordinator) AddTask(args *rpcdef.AddTaskArgs, reply *rpcdef.Result) error {
+func (c *Coordinator) AddTask(args *rpc.AddTaskArgs, reply *rpc.Result) error {
+	log.Println("AddTask Called args: " + fmt.Sprintf("%#v", args))
 	tasks_count := len(c.tasks)
 	n_map := 0
 
@@ -35,7 +28,8 @@ func (c *Coordinator) AddTask(args *rpcdef.AddTaskArgs, reply *rpcdef.Result) er
 		n_map += 1
 	}
 
-	for i := 0; i < args.N_Reduce; i++ {
+	var i int64
+	for ; i < args.N_Reduce; i++ {
 		var fs []string
 		for j := 0; j < n_map; j++ {
 			map_res_file := fmt.Sprintf("mr-%v-%v", j, i)
@@ -46,26 +40,23 @@ func (c *Coordinator) AddTask(args *rpcdef.AddTaskArgs, reply *rpcdef.Result) er
 
 	c.PrintInfo()
 
-	reply.Status_Code = rpcdef.SUCCESS
+	reply.Status_Code = rpc.SUCCESS
+
+	log.Println("AddTask reply: " + fmt.Sprintf("%#v", reply))
 
 	return nil
 }
 
-func (c *Coordinator) server() {
-	rpc.Register(c)
-	rpc.HandleHTTP()
-	sockname := rpcdef.CoordinatorSock()
-	os.Remove(sockname)
-	l, e := net.Listen("unix", sockname)
-	if e != nil {
-		log.Fatal("listen error:", e)
-	}
-	go http.Serve(l, nil)
+func (c *Coordinator) Serve() {
+	rpc.Serve(c)
 }
 
-func MakeCoordinator(files []string, nReduce int) *Coordinator {
+func MakeCoordinator() *Coordinator {
+	log.Println("Creating Coordinator")
 	c := Coordinator{}
-	c.server()
+
+	c.Serve()
+	log.Println("Serving Coordinator")
 
 	return &c
 }

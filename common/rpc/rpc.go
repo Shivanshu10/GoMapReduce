@@ -1,30 +1,13 @@
-package rpcdef
+package rpc
 
 import (
 	"fmt"
 	"log"
+	"net/http"
 	"net/rpc"
 	"os"
 	"strconv"
 )
-
-type AddTaskArgs struct {
-	Files     []string
-	Func_File string
-	N_Reduce  int
-}
-
-type Result struct {
-	Status_Code ResultStatusCode
-}
-
-type ExampleArgs struct {
-	X int
-}
-
-type ExampleReply struct {
-	Y int
-}
 
 func CoordinatorSock() string {
 	s := "/var/tmp/5840-mr-"
@@ -32,9 +15,17 @@ func CoordinatorSock() string {
 	return s
 }
 
+func Serve(c any) {
+	rpc.Register(c)
+	rpc.HandleHTTP()
+	e := http.ListenAndServe(":1234", nil)
+	if e != nil {
+		log.Fatal("listen error:", e)
+	}
+}
+
 func Call(rpcname string, args interface{}, reply interface{}) bool {
-	sockname := CoordinatorSock()
-	c, err := rpc.DialHTTP("unix", sockname)
+	c, err := rpc.DialHTTP("tcp", "127.0.0.1:1234")
 	if err != nil {
 		log.Fatal("dialing:", err)
 	}
