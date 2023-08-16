@@ -1,4 +1,4 @@
-package coordinatorlib
+package task
 
 type Task struct {
 	Id             int

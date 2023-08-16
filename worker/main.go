@@ -2,7 +2,7 @@ package main
 
 import (
 	"GoMapReduce/common/rpc"
-	"GoMapReduce/coordinator/coordinatorlib"
+	. "GoMapReduce/common/task"
 	"fmt"
 	"log"
 
@@ -11,7 +11,7 @@ import (
 
 func main() {
 	uuid := uuid.New()
-	task := &coordinatorlib.Task{}
+	task := &Task{}
 	rpc.Call("Coordinator.RequestTask", uuid.String(), &task)
 	log.Println(fmt.Sprintf("%#v", task))
 

@@ -1,4 +1,4 @@
-package coordinatorlib
+package task
 
 type TaskType byte
 

@@ -2,6 +2,7 @@ package coordinatorlib
 
 import (
 	"GoMapReduce/common/rpc"
+	. "GoMapReduce/common/task"
 	"fmt"
 	"log"
 )
