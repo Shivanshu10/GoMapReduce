@@ -47,6 +47,21 @@ func (c *Coordinator) AddTask(args *rpc.AddTaskArgs, reply *rpc.Result) error {
 	return nil
 }
 
+func (c *Coordinator) RequestTask(workerId string, reply *Task) error {
+	log.Println("Request Task Args: " + fmt.Sprintf("%s", workerId))
+	for idx, task := range c.tasks {
+		if task.Status == IDLE {
+			task.Worker_id = workerId
+			task.Status = RUNNING
+			c.tasks[idx] = task
+			*reply = task
+			break
+		}
+	}
+	c.PrintInfo()
+	return nil
+}
+
 func (c *Coordinator) Serve() {
 	rpc.Serve(c)
 }
@@ -54,7 +69,6 @@ func (c *Coordinator) Serve() {
 func MakeCoordinator() *Coordinator {
 	log.Println("Creating Coordinator")
 	c := Coordinator{}
-
 	c.Serve()
 	log.Println("Serving Coordinator")
 
